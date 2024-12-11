@@ -23,7 +23,7 @@ This project is designed to scrape, clean, and analyze data from parkrun events.
 ### Prerequisites
 - Python 3.x
 - Anaconda or a virtual environment
-- pandas, numpy, matplotlib (can be installed via `pip install`)
+- pandas, numpy, matplotlib
 
 ### Installation
 1. Clone this repository:
@@ -33,9 +33,6 @@ git clone https://github.com/owen-george/parkrun_analysis.git
 2. Navigate to the project directory:
 cd parkrun_analysis
 
-
-3. Install dependencies:
-pip install -r requirements.txt
 
 ### Usage
 1. Open Jupyter notebooks
