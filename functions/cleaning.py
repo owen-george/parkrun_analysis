@@ -143,10 +143,10 @@ def calculate_previous_metrics(df):
     df['prev_run_count'] = df.groupby('Runner_id')['prev_run_time'].cumcount()
 
     # Calculate average of previous runs
-    df['avg_prev_run_time'] = df['prev_run_time_cumsum'] / df['prev_run_count'].replace(0, 1)
+    df['avg_prev_run_times'] = df['prev_run_time_cumsum'] / df['prev_run_count'].replace(0, 1)
 
     # Drop helper columns
-    df = df.drop(columns=['prev_run_time', 'prev_run_time_cumsum', 'prev_run_count'])
+    df = df.drop(columns=['prev_run_time_cumsum', 'prev_run_count'])
 
     # Return to the original order
     return df.sort_index()
@@ -216,8 +216,8 @@ def reorder_columns(df):
         'Parkrun_count', 'Gender', 'Age_group', 'Time_in_minutes', 
         'temperature', 'windspeed', 'precipitation', 'Total_Appearances', 
         'Appearance_Instance', 'Days_since_last_parkrun', 
-        'Total_event_runners', 'PB_mins', 'ave_mins', 'prev_PB', 
-        'avg_prev_run_time'
+        'Total_event_runners', 'PB_mins', 'ave_mins', 'prev_run_time', 'prev_PB', 
+        'avg_prev_run_times'
     ]
     
     # Reorder columns, keeping only those present in the DataFrame
