@@ -196,28 +196,28 @@ def user_input(df):
     while True:
         try:
             # Prompt user for input
-            prev_time = input("Enter your most recent parkrun time in the form 'mins, secs' (Required): ")
+            prev_time = input("Enter your most recent parkrun time in the form 'mm:ss' (Required): ")
             
             # Split the input into mins and secs
-            mins, secs = map(int, prev_time.split(','))  # Convert both parts to integers
+            mins, secs = map(int, prev_time.split(':'))  # Convert both parts to integers
             
             # Convert to float minutes and assign to stats
             stats['prev_run_time'] = float(mins + secs / 60)
             break  # Exit the loop if successful
         except ValueError:
             # Handle invalid input
-            print("Invalid format. Please enter the time as 'mins, secs' (e.g., 25, 30).")
+            print("Invalid format. Please enter the time as 'mm:ss' (e.g. 25:30).")
     
     # Get PB (Personal Best)
     while True:
         try:
             # Prompt user for input
-            PB = input(f"Enter your previous PB in the form 'mins, secs'. "
+            PB = input(f"Enter your previous PB in the form 'mm:ss'. "
                        f"Leave blank to use your previous time {stats['prev_run_time']:.1f} mins: ")
             
             if PB.strip():  # If the input is not blank
                 # Split the input into mins and secs
-                mins, secs = map(int, PB.split(','))  # Convert both parts to integers
+                mins, secs = map(int, PB.split(':'))  # Convert both parts to integers
                 
                 # Convert to float minutes and assign to stats
                 stats['prev_PB'] = float(mins + secs / 60)
@@ -227,18 +227,18 @@ def user_input(df):
             break  # Exit the loop if successful
         except ValueError:
             # Handle invalid input
-            print("Invalid format. Please enter the PB as 'mins, secs' (e.g., 25, 30) or leave blank.")
+            print("Invalid format. Please enter the PB as 'mm:ss' (e.g. 25:30) or leave blank.")
     
     # Get average run time
     while True:
         try:
             # Prompt user for input
-            ave_time = input(f"Enter your average parkrun time in the form 'mins, secs'. "
+            ave_time = input(f"Enter your average parkrun time in the form 'mm:ss'. "
                              f"Leave blank to use your previous time {stats['prev_run_time']:.1f} mins: ")
             
             if ave_time.strip():  # If the input is not blank
                 # Split the input into mins and secs
-                mins, secs = map(int, ave_time.split(','))  # Convert both parts to integers
+                mins, secs = map(int, ave_time.split(':'))  # Convert both parts to integers
                 
                 # Convert to float minutes and assign to stats
                 stats['avg_prev_run_times'] = float(mins + secs / 60)
@@ -248,7 +248,7 @@ def user_input(df):
             break  # Exit the loop if successful
         except ValueError:
             # Handle invalid input
-            print("Invalid format. Please enter the time as 'mins, secs' (e.g., 25, 30) or leave blank.") 
+            print("Invalid format. Please enter the time as 'mm:ss' (e.g. 25:30) or leave blank.") 
     
     
     # Get Age_group_numeric
@@ -341,5 +341,5 @@ def target_time(user_stats,
     est_time = prediction[0] * user_stats['prev_run_time'][0]
 
     # Print the estimated time in minutes and seconds
-    print(f"Target time: {math.floor(est_time)}m{(est_time % 1) * 60:.0f}s")
+    print(f"Target time: {math.floor(est_time)}:{(est_time % 1) * 60:02.0f}")
     return est_time
