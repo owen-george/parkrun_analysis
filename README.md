@@ -1,7 +1,9 @@
 # Parkrun Analysis and Prediction
 
 ## Overview
-This project analyzes parkrun data to provide insights into individual and event-level performance. Using historical and real-time data, it builds machine learning models to predict target times for upcoming runs. The project aims to assist runners in setting achievable goals by incorporating factors such as previous performance, weather, and event characteristics.
+This project analyzes parkrun data to provide insights into individual and event-level performance.
+Using historical data, it builds machine learning models to predict target times for upcoming runs.
+The project aims to assist runners in setting achievable goals by incorporating factors such as previous performance, weather, and event characteristics.
 
 ## Project Features
 - **Data Collection:** Scrapes historical and real-time data from parkrun websites.
