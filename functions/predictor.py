@@ -535,8 +535,8 @@ def target_time(user_stats,
     # Calculate the estimated time
     est_time = prediction[0] * user_stats['prev_run_time'][0]
 
-    prev_time = df['prev_run_time'][0]
-    PB = df['prev_PB'][0]
+    prev_time = user_stats['prev_run_time'][0]
+    PB = user_stats['prev_PB'][0]
     
     # Print the estimated time in minutes and seconds
     print(f"Personal PB: {math.floor(PB)}:{(PB % 1) * 60:02.0f}")    
