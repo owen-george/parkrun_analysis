@@ -8,8 +8,9 @@ import random
 import pickle
 from datetime import datetime
 import math 
-
-from datetime import datetime
+import requests
+from bs4 import BeautifulSoup
+import sys 
 
 from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
@@ -176,7 +177,7 @@ def user_input(df):
     
     while True:
         try:
-            start_parkrun_date = input(f"Enter the rough date you started doing parkruns (leave blank for {est_start_date}, format YYYY-MM-DD): ")
+            start_parkrun_date = input(f"Enter the rough date you started doing parkruns in the format YYYY-MM-DD (Leave blank for an estimated date of {est_start_date}): ")
             if not start_parkrun_date:
                 start_parkrun_date = est_start_date
             # Try to parse the start parkrun date
@@ -212,7 +213,7 @@ def user_input(df):
     while True:
         try:
             # Prompt user for input
-            PB = input(f"Enter your previous PB in the form 'mm:ss'. "
+            PB = input(f"Enter your parkrun PB in the form 'mm:ss'. "
                        f"Leave blank to use your previous time {stats['prev_run_time']:.1f} mins: ")
             
             if PB.strip():  # If the input is not blank
@@ -303,6 +304,200 @@ def user_input(df):
     
     return user_stats
 
+def confirm_parkrunner(soup):
+    """
+    Confirms the parkrunner by showing the name and asking for input.
+    
+    Parameters:
+    - soup: BeautifulSoup object of the page.
+    """
+    name_list = soup.find('h2').text.strip().split()
+    name = " ".join(name_list)
+    name_test = input(f"Found name: {name}. Press enter to continue, input a different id to try again, or 'n' to exit: ")
+
+    if name_test == "":
+        return  # Continue with the current flow
+    elif name_test.isdigit():
+        new_parkrun_id = int(name_test)
+        fetch_runner_data(new_parkrun_id)  # Restart with the new ID
+    elif name_test.lower() == 'n':
+        raise SystemExit("Process cancelled")  # Exit the entire function
+    else:
+        print("Invalid input. Try again.")
+        confirm_parkrunner(soup)  # Recurse to retry the input
+
+def fetch_runner_data(parkrun_id: int, df: pd.DataFrame = None, next_date: str = None, weather: list = None) -> pd.DataFrame:
+    """
+    Fetches parkrun data for the given id and saves as a dataframe.
+    
+    Parameters:
+    - parkrun_id: int, the parkrunner id as an integer.
+    - df: pd.DataFrame, The dataframe of the parkrun location stats.
+    - next_date: str, Date of the next parkrun in the format YYYY-MM-DD. If blank, uses today's date.
+    - weather: list, a list of the estimated temperature (C), windspeed (km/h), and precipitation (mm). If blank, uses the average values for the location.
+
+    Outputs:
+    - A dataframe of the runner's stats
+    """
+  
+    # The URL for the complete runner stats
+    url = f'https://www.parkrun.org.uk/parkrunner/{parkrun_id}/all/'
+    
+    # Set up headers to avoid blocking by the website
+    headers = {
+         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edge/110.0.1587.56', 
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'DNT': '1',
+        'Cache-Control': 'max-age=0',
+        'TE': 'Trailers',
+        'Pragma': 'no-cache',
+        'Referer': 'https://www.parkrun.org.uk/',
+        'Origin': 'https://www.parkrun.org.uk',
+        'X-Requested-With': 'XMLHttpRequest',
+        'If-None-Match': 'W/"f0b3eb46c6c7e1f04161c38a1f041f4"'
+    }
+
+    try:
+        # Request the page content
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # Check for any HTTP errors
+        soup = BeautifulSoup(response.content, "html.parser")
+
+        # Call the function to confirm the parkrunner details
+        confirm_parkrunner(soup)
+        
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred: {e}")
+        
+    except SystemExit as e:
+        print(e)  # Handle exit and display the message
+
+    
+    stats = {}
+
+    #Gets parkrun date
+    next_date = next_date or datetime.today().strftime('%Y-%m-%d')
+
+    
+    try:
+        next_date = datetime.strptime(next_date, '%Y-%m-%d')
+    except ValueError:
+        print("Invalid date format. Using today's date.")
+        next_date = datetime.today().strftime('%Y-%m-%d')
+        
+   # Weather handling with validation
+    if weather is None:
+        if df.empty:
+            print("Dataframe is empty. Applied default weather values.")
+            temp, wind, precip = 10, 20, 0
+        else:
+            temp = df['temperature'].median()
+            wind = df['windspeed'].median()
+            precip = 0
+    else:
+        if len(weather) == 3:
+            temp = float(weather[0])
+            wind = float(weather[1])
+            precip = float(weather[2])
+        else:
+            print("Weather list must contain exactly 3 values (temp, wind, precip). Using default values.")
+            if df.empty:
+                temp, wind, precip = 10, 20, 0
+            else:
+                temp = df['temperature'].median()
+                wind = df['windspeed'].median()
+                precip = 0
+
+    stats['temperature'] = temp
+    stats['windspeed'] = wind
+    stats['precipitation'] = precip
+    
+    # Gets age category
+    age_cat = soup.find('p').text.strip().split()[-1]
+
+    # Converts to age (approx) and gender
+    age = int(age_cat[-2:])-2
+    gender = age_cat[1]
+
+    stats['Age_group_numeric'] = age
+    
+    if gender.lower() == 'm':
+        stats['Male'] = 1
+    elif gender.lower() == 'f':
+        stats['Male'] = 0
+    else: stats['Male'] = 0.5
+        
+    table = soup.find_all('table')
+
+    dates = []
+    times = []
+    
+    for row in table[2].find_all('tr'):
+        data_point = row.find_all('td')
+        if len(data_point) > 4:
+            date = data_point[1].find('span', class_="format-date")
+            time = data_point[4]
+    
+            if date:
+                dates.append(date.text.strip())
+            if time:
+                times.append(time.text.strip())
+                
+    # Saves as a dataframe
+    date_time_df = pd.DataFrame({'Date': dates, 'Time': times})
+
+    # Converts columns into appropriate format
+    date_time_df['Date'] = pd.to_datetime(date_time_df['Date'])
+    date_time_df['Time'] = date_time_df['Time'].apply(lambda x: int(x.split(':')[0]) + int(x.split(':')[1]) / 60)
+    
+    #Gets stats from runner dataframe
+    last_date = date_time_df['Date'].max()
+    first_date = date_time_df['Date'].min()
+    PB = date_time_df['Time'].min()
+    last_time = date_time_df['Time'].iloc[0]
+    ave_time = date_time_df['Time'].mean()
+    instance = date_time_df['Time'].count()+1
+
+    # Adds stats to dictionary
+    stats['Appearance_Instance'] = instance
+    stats['prev_PB'] = PB
+    stats['avg_prev_run_times'] = ave_time
+    stats['prev_run_time'] = last_time
+    
+    # Calculates missing stats
+    stats['Days_since_last_parkrun'] = (next_date - last_date).days
+    stats['Days_since_first_parkrun'] = (next_date - first_date).days
+
+    # Return as a single-row dataframe
+    stats_df = pd.DataFrame([stats])
+    
+    # Ensures everything is in correct format
+    user_stats = stats_df.astype({
+        'temperature': 'float64',
+        'windspeed': 'float64',
+        'precipitation': 'float64',
+        'Appearance_Instance': 'int64',
+        'Days_since_last_parkrun': 'float64',
+        'prev_run_time': 'float64',
+        'prev_PB': 'float64',
+        'avg_prev_run_times': 'float64',
+        'Age_group_numeric': 'float64',
+        'Days_since_first_parkrun': 'float64',
+        'Male': 'int64',
+    })
+    
+    user_stats = user_stats[['temperature', 'windspeed', 'precipitation',
+       'Appearance_Instance', 'Days_since_last_parkrun',
+       'prev_run_time', 'prev_PB', 'avg_prev_run_times',
+       'Age_group_numeric', 'Days_since_first_parkrun',
+       'Male']]   
+
+    return user_stats
+
 def target_time(user_stats,
                         df,
                         model_file_path='models/to_use/xgb_opt_model.pkl',
@@ -340,6 +535,11 @@ def target_time(user_stats,
     # Calculate the estimated time
     est_time = prediction[0] * user_stats['prev_run_time'][0]
 
+    prev_time = df['prev_run_time'][0]
+    PB = df['prev_PB'][0]
+    
     # Print the estimated time in minutes and seconds
+    print(f"Personal PB: {math.floor(PB)}:{(PB % 1) * 60:02.0f}")    
+    print(f"Previous time: {math.floor(prev_time)}:{(prev_time % 1) * 60:02.0f}")    
     print(f"Target time: {math.floor(est_time)}:{(est_time % 1) * 60:02.0f}")
     return est_time
