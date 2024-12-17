@@ -537,9 +537,11 @@ def target_time(user_stats,
 
     prev_time = user_stats['prev_run_time'][0]
     PB = user_stats['prev_PB'][0]
+    ave_time = user_stats['avg_prev_run_times'][0]
     
     # Print the estimated time in minutes and seconds
-    print(f"Personal PB: {math.floor(PB)}:{(PB % 1) * 60:02.0f}")    
+    print(f"Personal PB: {math.floor(PB)}:{(PB % 1) * 60:02.0f}")  
+    print(f"Ave. time: {math.floor(ave_time)}:{(ave_time % 1) * 60:02.0f}") 
     print(f"Previous time: {math.floor(prev_time)}:{(prev_time % 1) * 60:02.0f}")    
     print(f"Target time: {math.floor(est_time)}:{(est_time % 1) * 60:02.0f}")
     return est_time
