@@ -542,6 +542,6 @@ def target_time(user_stats,
     # Print the estimated time in minutes and seconds
     print(f"Personal PB: {math.floor(PB)}:{(PB % 1) * 60:02.0f}")  
     print(f"Ave. time: {math.floor(ave_time)}:{(ave_time % 1) * 60:02.0f}") 
-    print(f"Previous time: {math.floor(prev_time)}:{(prev_time % 1) * 60:02.0f}")    
+    print(f"Previous time: {math.floor(prev_time)}:{(prev_time % 1) * 60:02.0f}")
     print(f"Target time: {math.floor(est_time)}:{(est_time % 1) * 60:02.0f}")
     return est_time
