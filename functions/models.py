@@ -23,6 +23,41 @@ from xgboost import XGBRegressor
 import optuna
 from optuna.visualization import plot_optimization_history, plot_param_importances
 
+def remove_outliers(df, column):
+    """
+    Removes outliers from a specified column in a DataFrame using the IQR method, 
+    grouped by 'Age_group' and 'Gender'.
+    
+    Parameters:
+    df (pd.DataFrame): The DataFrame containing the data.
+    column (str): The name of the column to check for outliers.
+    
+    Returns:
+    pd.DataFrame: A DataFrame with outliers removed for each group.
+    """
+    # Group by 'Age_group' and 'Gender'
+    grouped_df = df.groupby(['Age_group', 'Gender'])
+    
+    def remove_outliers_from_group(group):
+        # Calculate Q1 (25th percentile) and Q3 (75th percentile) for each group
+        Q1 = group[column].quantile(0.25)
+        Q3 = group[column].quantile(0.75)
+        
+        # Calculate the IQR
+        IQR = Q3 - Q1
+        
+        # Define the lower and upper bounds for outlier detection
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        
+        # Filter the group to exclude outliers
+        return group[(group[column] >= lower_bound) & (group[column] <= upper_bound)]
+    
+    # Apply the outlier removal function to each group
+    filtered_df = grouped_df.apply(remove_outliers_from_group)
+    filtered_df = filtered_df.reset_index(drop=True)
+    return filtered_df
+
 def plot_feature_importance(model, feature_names, title):
     """
     Function to plot feature importance of a trained model, sorted from most to least significant.
