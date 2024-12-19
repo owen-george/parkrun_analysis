@@ -28,6 +28,7 @@ def process_parkrun_data_for_models(filepath='data/clean/cleaned_parkrun_no_outl
     # Default age group mapping if none is provided
     df = pd.read_csv(filepath)
     age_group_map = {
+        '15-17': 16,
         '18-19': 19,
         '20-24': 22,
         '25-29': 27,
@@ -39,7 +40,10 @@ def process_parkrun_data_for_models(filepath='data/clean/cleaned_parkrun_no_outl
         '55-59': 57,
         '60-64': 62,
         '65-69': 67,
-        '70-74': 72
+        '70-74': 72,
+        '75-79': 77,
+        '80-84': 82,
+        '85-89': 87
     }
     
     # Convert 'Date' column to datetime
