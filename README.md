@@ -72,10 +72,10 @@ This should clearly guide users on how to interact with both the Jupyter noteboo
 - **`data/`**: Contains raw and cleaned parkrun data.
   - `raw/`: Unprocessed CSV files.
   - `clean/`: Data ready for analysis.
-- **`EDA/`**: Exploratory Data Analysis (EDA) results, including supplementary figures and tables.
+- **`EDA/`**: Exploratory Data Analysis (EDA) jupyter notebook and Tableau visualisations.
 - **`functions/`**: Python modules for data scraping, cleaning, and feature engineering.
 - **`models/`**: Contains pickled machine learning models and scalers.
-- **`figures/`**: Visualizations generated from analysis and modeling.
+- **`figures/`**: Visualisations generated from analysis and modeling.
 
 ### Notebooks Overview
 1. **`1_scrape_and_load.ipynb`:** Scrapes parkrun data and exports it as a CSV file.
@@ -87,7 +87,7 @@ This should clearly guide users on how to interact with both the Jupyter noteboo
 ### Outputs
 - Predicted target time for the next parkrun based on key features.
 - Cleaned datasets for runners and events.
-- Visualizations (e.g., performance trends, weather impacts).
+- Visualisations (e.g., performance trends, weather impacts).
 
 ## Contributing
 Please fork the repository and make changes if you wish.
