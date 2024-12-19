@@ -329,18 +329,18 @@ if st.button("Check ID"):
     st.success(f"Runner name: {name}")
 
 # Optional: Next parkrun date
-next_date = st.date_input("Next Parkrun Date (optional):", value=date.today())
+next_date = st.date_input("Next Parkrun Date:", value=date.today())
 #next_date = datetime.strptime(next_parkrun_date, '%Y-%m-%d')
 
 # Weather Parameters
-st.subheader("Weather Conditions")
+st.subheader("Expected Weather Conditions")
 temp = st.slider("Temperature (°C):", min_value=-10, max_value=40, value=10)
 wind = st.slider("Wind Speed (km/h):", min_value=0, max_value=50, value=25)
-precipitation = st.slider("Precipitation (mm):", min_value=0.0, max_value=10.0, value=0.0)
+precipitation = st.slider("Precipitation (mm):", min_value=0.0, max_value=10.0, value=0.0, step=0.1, format="%.1f")
 weather_list = [temp, wind, precipitation]
 
 # Generate Prediction
-if st.button("Predict Target Time"):
+if st.button("Calculate Target Time"):
     runner_df = fetch_runner_data(parkrun_id, df, next_date, weather_list)
     prediction, prev_time, PB, ave_time = target_time(runner_df, model_to_use, scaler_to_use)
 
