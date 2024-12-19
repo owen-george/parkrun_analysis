@@ -14,8 +14,8 @@ The project aims to assist runners in setting achievable goals by incorporating 
 
 ## Technologies Used
 - **Programming Languages:** Python
-- **Libraries:** pandas, numpy, matplotlib, seaborn, requests, time, scikit-learn, pickle, random, xgboost, optuna
-- **Tools:** Jupyter Notebooks, Open Meteo API
+- **Libraries:** pandas, numpy, matplotlib, seaborn, requests, time, scikit-learn, pickle, random, xgboost, optuna, streamlit
+- **Tools:** Jupyter Notebooks, Open Meteo API, Streamlit, Tableau
 
 ## Getting Started
 
@@ -23,7 +23,7 @@ The project aims to assist runners in setting achievable goals by incorporating 
 Before you start, ensure you have the following installed:
 - Python 3.x
 - Anaconda (recommended) or a virtual environment
-- Libraries: `pandas`, `numpy`, `matplotlib`, `scikit-learn`, `pickle`, `requests`, `BeautifulSoup`, `seaborn`, `random`, `time`, `optuna`, `random`, `xgboost`
+- Libraries: `pandas`, `numpy`, `streamlit`, `matplotlib`, `scikit-learn`, `pickle`, `requests`, `BeautifulSoup`, `seaborn`, `random`, `time`, `optuna`, `random`, `xgboost`
 
 ### Installation
 1. Clone the repository:
@@ -38,16 +38,34 @@ Before you start, ensure you have the following installed:
 
 
 ### Usage
+
+#### **If you want to get data and build your own models:**
 1. **Run Notebooks in Order:**
    - Notebooks are numbered sequentially. Start with `1_scrape_and_load.ipynb` to collect raw parkrun data.
-   - Each notebook builds on the previous one, but you can skip directly to `5_Predictor.ipynb` to use the pre-trained model for predictions, which is trained on data from the Brighton parkrun up to 2024-12-07.
+   - Each notebook builds on the previous one, but you can skip directly to `5_Predictor.ipynb` to use the pre-trained model for predictions, which is trained on data from Brighton parkrun data up to 2024-12-07.
 
 2. **Example Command:**
-   - Use the default settings in `1_scrape_and_load.ipynb` to scrape Brighton parkrun data (events 1–826).
+   - Use `1_scrape_and_load.ipynb` to scrape parkrun data for a specified location.
    - Add weather data using `2_add_weather.ipynb`.
-   - Clean and process the data using `3_clean_and_filter.ipynb`
-   - Train a model in `4_ML_time_index.ipynb`
+   - Clean and process the data using `3_clean_and_filter.ipynb`.
+   - Train a model in `4_ML_time_index.ipynb`.
    - Use the model to get your target in `5_Predictor.ipynb`.
+
+#### **If you want to use existing models to get a target:**
+1. **With a parkrun ID:**
+   - Open the **Streamlit app** to get a prediction. 
+   - From the project directory, in the terminal run:
+     ```bash
+     streamlit run streamlit_predictor.py
+     ```
+   - Enter your parkrun ID and the weather conditions for your next run. The app will scrape your stats from the parkrun website and generate a personalized target time.
+
+2. **Without a parkrun ID:**
+   - Open `5_Predictor.ipynb` in Jupyter notebook and follow the instructions to manually input data and use the pre-trained model for predictions.
+
+---
+
+This should clearly guide users on how to interact with both the Jupyter notebooks and the Streamlit app.
 
 
 ### File Structure
